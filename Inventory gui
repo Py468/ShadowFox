@@ -1,0 +1,121 @@
+public class Inventory {
+    private String name;
+    private int quantity;
+    private double price;
+
+    public Inventory(String name, int quantity, double price) {
+        this.name = name;
+        this.quantity = quantity;
+        this.price = price;
+    }
+
+    // Getters and Setters
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+}
+import javafx.application.Application;
+        import javafx.collections.FXCollections;
+        import javafx.collections.ObservableList;
+        import javafx.geometry.Pos;
+        import javafx.scene.Scene;
+        import javafx.scene.control.*;
+        import javafx.scene.layout.*;
+        import javafx.stage.Stage;
+
+public class InventoryManagementSystem extends Application {
+
+    // Create the ObservableList to store inventory items
+    private ObservableList<InventoryItem> inventoryItems = FXCollections.observableArrayList();
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Inventory Management System");
+
+        // Create a TableView to display inventory items
+        TableView<InventoryItem> tableView = new TableView<>();
+        tableView.setItems(inventoryItems);
+
+        // Define columns
+        TableColumn<InventoryItem, String> nameColumn = new TableColumn<>("Item Name");
+        nameColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getName()));
+
+        TableColumn<InventoryItem, Integer> quantityColumn = new TableColumn<>("Quantity");
+        quantityColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
+
+        TableColumn<InventoryItem, Double> priceColumn = new TableColumn<>("Price");
+        priceColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
+
+        tableView.getColumns().addAll(nameColumn, quantityColumn, priceColumn);
+
+        // Create input fields
+        TextField nameField = new TextField();
+        nameField.setPromptText("Item Name");
+
+        TextField quantityField = new TextField();
+        quantityField.setPromptText("Quantity");
+
+        TextField priceField = new TextField();
+        priceField.setPromptText("Price");
+
+        // Add Button
+        Button addButton = new Button("Add Item");
+        addButton.setOnAction(e -> {
+            String name = nameField.getText();
+            int quantity = Integer.parseInt(quantityField.getText());
+            double price = Double.parseDouble(priceField.getText());
+
+            inventoryItems.add(new InventoryItem(name, quantity, price));
+            clearFields(nameField, quantityField, priceField);
+        });
+
+        // Update Button
+        Button updateButton = new Button("Update Item");
+        updateButton.setOnAction(e -> {
+            InventoryItem selectedItem = tableView.getSelectionModel().getSelectedItem();
+            if (selectedItem != null) {
+                selectedItem.setName(nameField.getText());
+                selectedItem.setQuantity(Integer.parseInt(quantityField.getText()));
+                selectedItem.setPrice(Double.parseDouble(priceField.getText()));
+                tableView.refresh();  // Refresh the table to show updated data
+                clearFields(nameField, quantityField, priceField);
+            }
+        });
+
+        // Delete Button
+        Button deleteButton = new Button("Delete Item");
+        deleteButton.setOnAction(e -> {
+            InventoryItem selectedItem = tableView.getSelectionModel().getSelectedItem();
+            inventoryItems.remove(selectedItem);
+        });
+
+        // Create the layout
+        HBox inputLayout = new HBox(10, nameField, quantityField, priceField, addButton, updateButton, deleteButton);
+        inputLayout.setAlignment(Pos.CENTER);
+
+        VBox layout = new VBox(10, tableView, inputLayout);
+        layout.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(layout, 600, 400);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    // Method to clear input fields
+    private void clearFields(TextField nameField, TextField quantityField, TextField priceField) {
+        nameField.clear();
+        quantityField.clear();
+        priceField.clear();
+    }
+}
+
+
